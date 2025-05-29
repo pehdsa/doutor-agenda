@@ -1,5 +1,11 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import {
   Card,
   CardContent,
@@ -17,10 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { useRouter } from "next/navigation";
 
 const registerSchema = z.object({
   name: z.string().trim().min(1, "Nome é obrigatório"),
@@ -33,6 +36,8 @@ const registerSchema = z.object({
 });
 
 export const SignUpForm = () => {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const registerForm = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -42,10 +47,30 @@ export const SignUpForm = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof registerSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof registerSchema>) {
+    try {
+      setIsLoading(true);
+      await authClient.signUp.email(
+        {
+          email: values.email,
+          password: values.password,
+          name: values.name,
+        },
+        {
+          onSuccess: () => {
+            router.push("/dashboard");
+          },
+          onError: (error) => {
+            console.error("Sign up error:", error);
+            // You can handle the error here, e.g., show a toast notification
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Error during sign up:", error);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -109,8 +134,18 @@ export const SignUpForm = () => {
             />
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full">
-              Criar conta
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={registerForm.formState.isSubmitting}
+            >
+              {registerForm.formState.isSubmitting ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" /> Criando conta...
+                </>
+              ) : (
+                "Criar conta"
+              )}
             </Button>
           </CardFooter>
         </form>
