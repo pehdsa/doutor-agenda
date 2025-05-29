@@ -1,5 +1,11 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { authClient } from "@/lib/auth-client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import {
   Card,
   CardContent,
@@ -17,10 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { Loader2 } from "lucide-react";
 
 const loginSchema = z.object({
   email: z
@@ -32,6 +35,7 @@ const loginSchema = z.object({
 });
 
 export const SignInForm = () => {
+  const router = useRouter();
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -40,10 +44,24 @@ export const SignInForm = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof loginSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof loginSchema>) {
+    await authClient.signIn.email(
+      {
+        email: values.email,
+        password: values.password,
+      },
+      {
+        onSuccess: () => {
+          router.push("/dashboard");
+        },
+        onError: (error) => {
+          console.error("Login failed:", error.error.message);
+          toast.error("Login falhou", {
+            description: "Verifique suas credenciais e tente novamente.",
+          });
+        },
+      }
+    );
   }
   return (
     <Card>
@@ -88,8 +106,18 @@ export const SignInForm = () => {
             />
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full">
-              Logar
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" /> Logando
+                </>
+              ) : (
+                "Logar"
+              )}
             </Button>
           </CardFooter>
         </form>

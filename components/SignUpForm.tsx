@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   Card,
   CardContent,
@@ -23,7 +25,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
 
 const registerSchema = z.object({
   name: z.string().trim().min(1, "Nome é obrigatório"),
@@ -61,8 +62,10 @@ export const SignUpForm = () => {
             router.push("/dashboard");
           },
           onError: (error) => {
-            console.error("Sign up error:", error);
-            // You can handle the error here, e.g., show a toast notification
+            console.error("Login failed:", error.error.message);
+            toast.error("Login falhou", {
+              description: "Verifique suas credenciais e tente novamente.",
+            });
           },
         }
       );
