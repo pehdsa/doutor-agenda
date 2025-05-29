@@ -49,31 +49,26 @@ export const SignUpForm = () => {
   });
 
   async function onSubmit(values: z.infer<typeof registerSchema>) {
-    try {
-      setIsLoading(true);
-      await authClient.signUp.email(
-        {
-          email: values.email,
-          password: values.password,
-          name: values.name,
+    await authClient.signUp.email(
+      {
+        email: values.email,
+        password: values.password,
+        name: values.name,
+      },
+      {
+        onSuccess: () => {
+          router.push("/dashboard");
         },
-        {
-          onSuccess: () => {
-            router.push("/dashboard");
-          },
-          onError: (error) => {
-            console.error("Login failed:", error.error.message);
-            toast.error("Login falhou", {
-              description: "Verifique suas credenciais e tente novamente.",
-            });
-          },
-        }
-      );
-    } catch (error) {
-      console.error("Error during sign up:", error);
-    } finally {
-      setIsLoading(false);
-    }
+        onError: (ctx) => {
+          if (ctx.error.code === "USER_ALREADY_EXISTS") {
+            toast.error("E-mail já cadastrado");
+            return;
+          }
+
+          toast.error("Erro ao criar conta");
+        },
+      }
+    );
   }
 
   return (

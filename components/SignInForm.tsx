@@ -56,9 +56,7 @@ export const SignInForm = () => {
         },
         onError: (error) => {
           console.error("Login failed:", error.error.message);
-          toast.error("Login falhou", {
-            description: "Verifique suas credenciais e tente novamente.",
-          });
+          toast.error("Login falhou");
         },
       }
     );
