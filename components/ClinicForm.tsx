@@ -16,7 +16,6 @@ import { DialogFooter } from "./ui/dialog";
 import { createClinic } from "@/actions/create-clinic";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { useRouter } from "next/router";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 const clinicFormSchema = z.object({

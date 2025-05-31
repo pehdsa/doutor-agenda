@@ -9,7 +9,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { ClinicForm } from "@/components/ClinicForm";
 
 const ClinicFormPage = async () => {
