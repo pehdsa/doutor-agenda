@@ -1,3 +1,5 @@
+"use client";
+
 import { doctorsTable } from "@/db/schema";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
@@ -12,12 +14,14 @@ import {
   getAvailability,
   getInitials,
 } from "@/lib/utils";
+import { useState } from "react";
 
 interface DoctorCardProps {
   doctor: typeof doctorsTable.$inferSelect;
 }
 
 export const DoctorCard = ({ doctor }: DoctorCardProps) => {
+  const [isOpen, setIsOpen] = useState(false);
   const availability = getAvailability(doctor);
 
   return (
@@ -61,11 +65,18 @@ export const DoctorCard = ({ doctor }: DoctorCardProps) => {
       </CardContent>
       <Separator />
       <CardFooter>
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button className="w-full">Ver detalhes</Button>
           </DialogTrigger>
-          <UpsertDoctorForm />
+          <UpsertDoctorForm
+            onSuccess={() => setIsOpen(false)}
+            doctor={{
+              ...doctor,
+              availableFromTime: availability.from.format("HH:mm:ss"),
+              availableToTime: availability.to.format("HH:mm:ss"),
+            }}
+          />
         </Dialog>
       </CardFooter>
     </Card>
