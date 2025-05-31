@@ -30,6 +30,7 @@ import {
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { usePathname, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { getInitials } from "@/lib/utils";
 
 const items = [
   {
@@ -102,8 +103,10 @@ export const AppSidebar = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton size="lg">
-                  <Avatar>
-                    <AvatarFallback>FB</AvatarFallback>
+                  <Avatar className="size-10">
+                    <AvatarFallback className="bg-primary-foreground">
+                      {getInitials(session.data?.user?.clinic?.name)}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="grow">
                     <p className="text-sm">
