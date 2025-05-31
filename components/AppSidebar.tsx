@@ -18,6 +18,7 @@ import {
   Stethoscope,
   CalendarDays,
   LogOut,
+  EllipsisVertical,
 } from "lucide-react";
 import Image from "next/image";
 import {
@@ -104,11 +105,14 @@ export const AppSidebar = () => {
                   <Avatar>
                     <AvatarFallback>FB</AvatarFallback>
                   </Avatar>
-                  <div>
+                  <div className="grow">
                     <p className="text-sm">{session.data?.user.clinic?.name}</p>
                     <p className="text-muted-foreground text-sm">
                       {session.data?.user.email}
                     </p>
+                  </div>
+                  <div>
+                    <EllipsisVertical color="#0B68F7" size={18} />
                   </div>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
