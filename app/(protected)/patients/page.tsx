@@ -12,7 +12,7 @@ import {
 import { db } from "@/db";
 import { patientsTable } from "@/db/schema";
 import { auth } from "@/lib/auth";
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { patientsTableColumns } from "@/components/PatientTableColumn";
@@ -29,6 +29,7 @@ const PatientsPage = async () => {
   }
   const patients = await db.query.patientsTable.findMany({
     where: eq(patientsTable.clinicId, session.user.clinic.id),
+    orderBy: [asc(patientsTable.id)],
   });
 
   return (

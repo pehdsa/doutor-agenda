@@ -35,6 +35,7 @@ import { NumericFormat } from "react-number-format";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { doctorsTable } from "@/db/schema";
+import { useEffect } from "react";
 
 const formSchema = z
   .object({
@@ -72,11 +73,13 @@ const formSchema = z
 interface UpsertDoctorFormProps {
   doctor?: typeof doctorsTable.$inferSelect;
   onSuccess?: () => void;
+  isOpen: boolean;
 }
 
 export const UpsertDoctorForm = ({
   doctor,
   onSuccess,
+  isOpen,
 }: UpsertDoctorFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     shouldUnregister: true,
@@ -93,6 +96,22 @@ export const UpsertDoctorForm = ({
       availableToTime: doctor?.availableToTime ?? "",
     },
   });
+
+  useEffect(() => {
+    if (isOpen) {
+      form.reset({
+        name: doctor?.name ?? "",
+        speciality: doctor?.specialty ?? "",
+        appoitmentPrice: doctor?.appointmentPriceInCents
+          ? doctor.appointmentPriceInCents / 100
+          : 0,
+        availableFromWeekDay: doctor?.availableFromWeekDay?.toString() ?? "1",
+        availableToWeekDay: doctor?.availableToWeekDay?.toString() ?? "5",
+        availableFromTime: doctor?.availableFromTime ?? "",
+        availableToTime: doctor?.availableToTime ?? "",
+      });
+    }
+  }, [isOpen, form, doctor]);
 
   const upsertDoctorAction = useAction(upsertDoctor, {
     onSuccess: () => {
