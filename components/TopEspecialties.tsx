@@ -58,6 +58,12 @@ export default function TopSpecialties({
           </div>
         </div>
 
+        {topSpecialties.length === 0 && (
+          <div className="text-sm text-center text-muted-foreground pt-5">
+            Nenhum dado encontrado.
+          </div>
+        )}
+
         {/* specialtys List */}
         <div className="space-y-6">
           {topSpecialties.map((specialty) => {

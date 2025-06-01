@@ -24,6 +24,12 @@ export default function TopDoctors({ doctors }: TopDoctorsProps) {
           </div>
         </div>
 
+        {doctors.length === 0 && (
+          <div className="text-sm text-center text-muted-foreground pt-5">
+            Nenhum dado encontrado.
+          </div>
+        )}
+
         {/* Doctors List */}
         <div className="space-y-6">
           {doctors.map((doctor) => (
