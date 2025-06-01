@@ -1,11 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import { doctorsTable } from "@/db/schema";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
 import { Separator } from "./ui/separator";
 import { Badge } from "./ui/badge";
-import { CalendarIcon, ClockIcon, DollarSignIcon } from "lucide-react";
+import {
+  CalendarIcon,
+  ClockIcon,
+  DollarSignIcon,
+  Loader2,
+  Trash2Icon,
+} from "lucide-react";
 import { Dialog, DialogTrigger } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { UpsertDoctorForm } from "./UpsertDoctorForm";
@@ -14,7 +21,20 @@ import {
   getAvailability,
   getInitials,
 } from "@/lib/utils";
-import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog";
+import { deleteDoctor } from "@/actions/delete-doctor";
+import { useAction } from "next-safe-action/hooks";
+import { toast } from "sonner";
 
 interface DoctorCardProps {
   doctor: typeof doctorsTable.$inferSelect;
@@ -22,7 +42,30 @@ interface DoctorCardProps {
 
 export const DoctorCard = ({ doctor }: DoctorCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isAlerModalOpen, setIsAlerModalOpen] = useState(false);
   const availability = getAvailability(doctor);
+
+  const deleteDoctorAction = useAction(deleteDoctor, {
+    onSuccess: () => {
+      toast.success("Médico deletado com sucesso!");
+      setTimeout(() => {
+        setIsAlerModalOpen(false);
+      }, 1000);
+    },
+    onError: () => {
+      toast.error("Erro ao deletar médico. Tente novamente.");
+    },
+  });
+
+  const handleDeleteDoctor = async () => {
+    if (!doctor?.id) {
+      toast.error("Médico não encontrado.");
+      return;
+    }
+    deleteDoctorAction.execute({
+      id: doctor.id,
+    });
+  };
 
   return (
     <Card>
@@ -64,10 +107,10 @@ export const DoctorCard = ({ doctor }: DoctorCardProps) => {
         </Badge>
       </CardContent>
       <Separator />
-      <CardFooter>
+      <CardFooter className="gap-1">
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <Button className="w-full">Ver detalhes</Button>
+            <Button className="grow w-fit">Ver detalhes</Button>
           </DialogTrigger>
           <UpsertDoctorForm
             onSuccess={() => setIsOpen(false)}
@@ -78,6 +121,42 @@ export const DoctorCard = ({ doctor }: DoctorCardProps) => {
             }}
           />
         </Dialog>
+
+        <AlertDialog open={isAlerModalOpen} onOpenChange={setIsAlerModalOpen}>
+          <AlertDialogTrigger asChild>
+            <Button variant="outline" className="border-destructive">
+              <Trash2Icon
+                color="oklch(0.577 0.245 27.325)"
+                className="size-3"
+              />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                Tem certeza que deseja deletar este médico?
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                Essa ação não pode ser desfeita. Isso irá remover o médico e
+                todas as consutas agendadas.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <Button
+                onClick={handleDeleteDoctor}
+                disabled={deleteDoctorAction.isExecuting}
+                variant="destructive"
+              >
+                {deleteDoctorAction.isExecuting ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  "Deletar"
+                )}
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardFooter>
     </Card>
   );

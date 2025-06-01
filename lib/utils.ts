@@ -14,11 +14,19 @@ export function cn(...inputs: ClassValue[]) {
 
 export function getInitials(name: string | null | undefined): string {
   if (!name) return "";
-  return name
+
+  const words = name
+    .trim()
     .split(" ")
-    .map((word) => word.charAt(0))
-    .join("")
-    .toUpperCase();
+    .filter((word) => word.length > 0);
+
+  if (words.length === 0) return "";
+  if (words.length === 1) return words[0].charAt(0).toUpperCase();
+
+  const firstInitial = words[0].charAt(0);
+  const lastInitial = words[words.length - 1].charAt(0);
+
+  return (firstInitial + lastInitial).toUpperCase();
 }
 
 export function getAvailability(doctor: typeof doctorsTable.$inferSelect) {
