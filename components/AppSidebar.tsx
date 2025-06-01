@@ -19,6 +19,7 @@ import {
   CalendarDays,
   LogOut,
   EllipsisVertical,
+  Gem,
 } from "lucide-react";
 import Image from "next/image";
 import {
@@ -95,6 +96,18 @@ export const AppSidebar = () => {
         </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupLabel>Outros</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton isActive={pathname === "/plans"} asChild>
+                  <Link href="/plans">
+                    <Gem />
+                    <span>Planos</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
